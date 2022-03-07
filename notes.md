@@ -1,0 +1,1 @@
+grep '^[a-z]\{5\}$' dictionary.txt
