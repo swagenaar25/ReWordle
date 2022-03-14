@@ -1,3 +1,5 @@
+# Original by Dakota Goldberg
+# Modified by Sam Wagenaar
 import random
 from colorama import Fore, Back, Style
 from string import ascii_lowercase
