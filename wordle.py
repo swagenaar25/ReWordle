@@ -1,46 +1,74 @@
 import random
 from colorama import Fore, Back, Style
+from string import ascii_lowercase
+
 wordCorrect = False
 guesses = []
-numGuess = 1
 
-def selectWord():
-    lines = open('dictionary.txt').read().splitlines()
-    chosenWord = random.choice(lines)
-    return chosenWord
 
-word = selectWord().lower()
+# Create word list
+def gen_list(length):
+    words = []
+    lines = open('full_dictionary.txt').read().splitlines()
+    for line in lines:
+        if length == -1 or len(line) == length:
+            ok = True
+            for letter in line:
+                if letter not in ascii_lowercase:
+                    ok = False
+            if ok:
+                words.append(line)
+    return words
 
-def isWord(wordGuess):
-    return wordGuess in open('dictionary.txt').read().splitlines()
 
-def paintAccuracy(guess, word):
-    for i in range(len(guess)):
-        if guess[i] == word[i]:
-            print(Fore.GREEN + guess[i], end="")
-        elif guess[i] in word:
-            print(Fore.YELLOW + guess[i], end="")
+tmpWord = random.choice(gen_list(-1))
+wordLength = len(tmpWord)
+
+word_list = gen_list(wordLength)
+
+print(f"List length: {len(word_list)}\nWord Length: {wordLength}")
+'''for x in range(1, 25):
+    tmp = gen_list(x)
+    print(f"[{x}]: {len(tmp)} {tmp}")'''
+
+
+def select_word():
+    # lines = open('dictionary.txt').read().splitlines()
+    return random.choice(word_list)  # lines)
+
+
+word = select_word().lower()
+
+
+def is_valid_word(word_guess):
+    return word_guess in word_list  # open('dictionary.txt').read().splitlines()
+
+
+def paint_accuracy(guess_word, answer_word):
+    for i in range(len(guess_word)):
+        if guess_word[i] == answer_word[i]:
+            print(Fore.GREEN + guess_word[i], end="")
+        elif guess_word[i] in answer_word:
+            print(Fore.YELLOW + guess_word[i], end="")
         else:
-            print(Fore.WHITE + guess[i], end="")
-    print("")
+            print(Fore.WHITE + guess_word[i], end="")
+    print(Style.RESET_ALL)
 
 
-while (not wordCorrect):
-    if (numGuess == 7):
-        print(Fore.WHITE + f"Sorry, you only have 6 chances to guess. The word was \"{word}\".")
+while not wordCorrect:
+    if len(guesses) == 6:
+        print(Fore.WHITE + f"Sorry, you only have 6 chances to guess. The word was \"{word}\"." + Style.RESET_ALL)
         break
-    guess = input(Fore.WHITE + f"\nGuess #{numGuess}/6: enter a word: ").lower()
-    if (len(guess) != 5):
-        print("Your word must be 5 letters!")
+    guess = input(Fore.WHITE + f"\nGuess #{len(guesses) + 1}/6: enter a word: " + Style.RESET_ALL).lower()
+    if len(guess) != wordLength:
+        print(f"Your word must be {wordLength} letters!")
         continue
-    elif (not isWord(guess)):
+    elif not is_valid_word(guess):
         print("Sorry, that word is not in our dictionary!")
         continue
-    numGuess+=1
-    guesses.append(guess);
+    guesses.append(guess)
     for g in guesses:
-        paintAccuracy(g, word)
+        paint_accuracy(g, word)
     if word == guess:
         print("Congratulations!")
         wordCorrect = True
-
