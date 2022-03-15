@@ -40,6 +40,7 @@ def select_word():
 
 
 word = select_word().lower()
+print(word)
 
 
 def is_valid_word(word_guess):
@@ -47,11 +48,22 @@ def is_valid_word(word_guess):
 
 
 def paint_accuracy(guess_word, answer_word):
+    letters_available = {}
+    for letter in answer_word:
+        if letter not in letters_available:
+            letters_available[letter] = 0
+        letters_available[letter] += 1
+
+    for i in range(len(guess_word)):
+        if guess_word[i] == answer_word[i]:
+            letters_available[guess_word[i]] -= 1
+
     for i in range(len(guess_word)):
         if guess_word[i] == answer_word[i]:
             print(Fore.GREEN + guess_word[i], end="")
-        elif guess_word[i] in answer_word:
+        elif guess_word[i] in answer_word and letters_available[guess_word[i]] > 0:
             print(Fore.YELLOW + guess_word[i], end="")
+            letters_available[guess_word[i]] -= 1
         else:
             print(Fore.WHITE + guess_word[i], end="")
     print(Style.RESET_ALL)
