@@ -1,5 +1,4 @@
-# Original by Dakota Goldberg
-# Modified by Sam Wagenaar
+# By Sam Wagenaar
 import pygame
 import wordle_api
 import random

@@ -1,6 +1,8 @@
+# Extracted by Sam Wagenaar from code by Dakota Goldberg
 import random
 from string import ascii_lowercase
 
+# Color codes
 GREEN = "@"
 YELLOW = "#"
 WHITE = "$"
