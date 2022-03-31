@@ -14,18 +14,20 @@ print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 
 
 def paint_accuracy(guess_word):
-    text = wordle.generate_response(guess_word)\
-        .replace("$G$", Fore.GREEN)\
-        .replace("$Y$", Fore.YELLOW)\
-        .replace("$W$", Fore.WHITE)\
-        .replace("$R$", Style.RESET_ALL)
+    text = wordle.generate_response(guess_word) \
+        .replace(wordle_api.GREEN, Fore.GREEN) \
+        .replace(wordle_api.YELLOW, Fore.YELLOW) \
+        .replace(wordle_api.WHITE, Fore.WHITE) \
+        .replace(wordle_api.RESET, Style.RESET_ALL)
     print(text)
+
 
 paint_accuracy(wordle.word)
 
 while not wordle.correct:
     if len(wordle.guesses) == 6:
-        print(Fore.WHITE + f"Sorry, you only have 6 chances to guess. The word was \"{wordle.word}\"." + Style.RESET_ALL)
+        print(
+            Fore.WHITE + f"Sorry, you only have 6 chances to guess. The word was \"{wordle.word}\"." + Style.RESET_ALL)
         break
     guess = input(Fore.WHITE + f"\nGuess #{len(wordle.guesses) + 1}/6: enter a word: " + Style.RESET_ALL).lower()
     if not wordle.is_valid_length(guess):

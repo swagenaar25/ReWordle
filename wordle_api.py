@@ -1,13 +1,13 @@
 import random
 from string import ascii_lowercase
 
+GREEN = "@"
+YELLOW = "#"
+WHITE = "$"
+RESET = "%"
+
 
 class Wordle:
-
-    GREEN = "$G$"
-    YELLOW = "$Y$"
-    WHITE = "$W$"
-    RESET = "$R$"
 
     def __init__(self):
         self.wordList = []
@@ -39,6 +39,11 @@ class Wordle:
         self.word = random.choice(self.wordList)
         self.guesses = []
 
+    def pick_word_reasonable_length(self):
+        self.pick_word_any_length()
+        while 2 > len(self.word) > 9:
+            self.pick_word_any_length()
+
     def is_valid_guess(self, guess):
         return guess in self.wordList
 
@@ -59,11 +64,11 @@ class Wordle:
         out = ""
         for i in range(len(guess_word)):
             if guess_word[i] == self.word[i]:
-                out += self.GREEN + guess_word[i]
+                out += GREEN + guess_word[i]
             elif guess_word[i] in self.word and letters_available[guess_word[i]] > 0:
-                out += self.YELLOW + guess_word[i]
+                out += YELLOW + guess_word[i]
                 letters_available[guess_word[i]] -= 1
             else:
-                out += self.WHITE + guess_word[i]
-        out += self.RESET
+                out += WHITE + guess_word[i]
+        out += RESET
         return out
