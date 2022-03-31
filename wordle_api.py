@@ -4,7 +4,8 @@ from string import ascii_lowercase
 GREEN = "@"
 YELLOW = "#"
 WHITE = "$"
-RESET = "%"
+DARK = "%"
+RESET = "^"
 
 
 class Wordle:
@@ -72,3 +73,27 @@ class Wordle:
                 out += WHITE + guess_word[i]
         out += RESET
         return out
+
+    def generate_letter_accuracies(self, guess_word):
+        letters_available = {}
+        for letter in self.word:
+            if letter not in letters_available:
+                letters_available[letter] = 0
+            letters_available[letter] += 1
+
+        for i in range(len(guess_word)):
+            if guess_word[i] == self.word[i]:
+                letters_available[guess_word[i]] -= 1
+
+        grey = []
+        yellow = []
+        green = []
+        for i in range(len(guess_word)):
+            if guess_word[i] == self.word[i]:
+                green.append(guess_word[i])
+            elif guess_word[i] in self.word and letters_available[guess_word[i]] > 0:
+                yellow.append(guess_word[i])
+                letters_available[guess_word[i]] -= 1
+            else:
+                grey.append(guess_word[i])
+        return grey, yellow, green
