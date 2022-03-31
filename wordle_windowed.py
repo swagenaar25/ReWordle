@@ -96,7 +96,8 @@ def run_game():
     play_again = False
     wordle = wordle_api.Wordle()
     # change to pick_word_reasonable_length for more random lengths while being sensible
-    wordle.pick_word_from_length(5)
+    # wordle.pick_word_from_length(5)
+    wordle.pick_word_reasonable_length()
 
     print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 

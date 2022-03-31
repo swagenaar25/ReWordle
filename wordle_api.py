@@ -44,7 +44,7 @@ class Wordle:
 
     def pick_word_reasonable_length(self):
         self.pick_word_any_length()
-        while 2 > len(self.word) > 9:
+        while 2 > len(self.word) > 7:
             self.pick_word_any_length()
 
     def is_valid_guess(self, guess):
