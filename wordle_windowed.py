@@ -87,9 +87,9 @@ def render_keyboard(top, middle, bottom, pos):
     x = pos[0]
     y = pos[1]
     # Letter width 25
-    y += render_word(gen_keyboard_line(top), (x, y))+15
-    y += render_word(gen_keyboard_line(middle), (x+12, y))+15
-    y += render_word(gen_keyboard_line(bottom), (x+37, y))+15
+    y += render_word(gen_keyboard_line(top), (x, y)) + 15
+    y += render_word(gen_keyboard_line(middle), (x + 12, y)) + 15
+    y += render_word(gen_keyboard_line(bottom), (x + 37, y)) + 15
 
 
 def run_game():
@@ -191,6 +191,7 @@ def run_game():
             interactable = False
         pygame.display.update()
     return play_again
+
 
 keep_playing = run_game()
 while keep_playing:
