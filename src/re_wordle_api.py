@@ -57,11 +57,6 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-print(os.listdir(resource_path(".")))
-print(os.listdir(resource_path("assets")))
-print(os.listdir(resource_path("assets/fonts")))
-
-
 class Wordle:
 
     def __init__(self):
@@ -96,7 +91,7 @@ class Wordle:
 
     def pick_word_reasonable_length(self):
         self.pick_word_any_length()
-        while 2 > len(self.word) > 7:
+        while len(self.word) < 2 or len(self.word) > 7:
             self.pick_word_any_length()
 
     def is_valid_guess(self, guess):
