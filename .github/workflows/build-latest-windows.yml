@@ -35,14 +35,14 @@ jobs:
 
       - name: PyInstaller Windows ReWordle Console
         uses: JackMcKew/pyinstaller-action-windows@main
-          with:
+        with:
             # Directory containing source code & .spec file (optional requirements.txt).
             path: src # default is src
             # Specify a file path for .spec file
             spec: re_wordle_console.spec # optional, default is
       - name: PyInstaller Windows ReWordle Windowed
         uses: JackMcKew/pyinstaller-action-windows@main
-          with:
+        with:
             # Directory containing source code & .spec file (optional requirements.txt).
             path: src # default is src
             # Specify a file path for .spec file
@@ -95,14 +95,14 @@ jobs:
 
       - name: PyInstaller Windows ReWordle Console
         uses: JackMcKew/pyinstaller-action-windows@main
-          with:
+        with:
             # Directory containing source code & .spec file (optional requirements.txt).
             path: src # default is src
             # Specify a file path for .spec file
             spec: re_wordle_console.spec # optional, default is
       - name: PyInstaller Windows ReWordle Windowed
         uses: JackMcKew/pyinstaller-action-windows@main
-          with:
+        with:
             # Directory containing source code & .spec file (optional requirements.txt).
             path: src # default is src
             # Specify a file path for .spec file
