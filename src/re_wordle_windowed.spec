@@ -2,7 +2,7 @@
 
 block_cipher = None
 
-data_files = [("../assets/*","assets")]
+data_files = [("../assets","assets")]
 
 a = Analysis(['re_wordle_windowed.py'],
              pathex=['../src'],
