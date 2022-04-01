@@ -1,10 +1,25 @@
-# Original by Dakota Goldberg
-# Modified by Sam Wagenaar
-import random
-from colorama import Fore, Back, Style
-import wordle_api
+"""
+Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
 
-wordle = wordle_api.Wordle()
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+from colorama import Fore, Back, Style
+import re_wordle_api
+
+re_wordle_api.show_license_notice()
+
+wordle = re_wordle_api.Wordle()
 wordle.pick_word_any_length()
 
 print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
@@ -15,10 +30,10 @@ print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 
 def paint_accuracy(guess_word):
     text = wordle.generate_response(guess_word) \
-        .replace(wordle_api.GREEN, Fore.GREEN) \
-        .replace(wordle_api.YELLOW, Fore.YELLOW) \
-        .replace(wordle_api.WHITE, Fore.WHITE) \
-        .replace(wordle_api.RESET, Style.RESET_ALL)
+        .replace(re_wordle_api.GREEN, Fore.GREEN) \
+        .replace(re_wordle_api.YELLOW, Fore.YELLOW) \
+        .replace(re_wordle_api.WHITE, Fore.WHITE) \
+        .replace(re_wordle_api.RESET, Style.RESET_ALL)
     print(text)
 
 

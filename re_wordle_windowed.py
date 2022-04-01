@@ -1,9 +1,26 @@
-# By Sam Wagenaar
+"""
+Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
 import pygame
-import wordle_api
+import re_wordle_api
 import random
 import string
 import time
+
+re_wordle_api.show_license_notice()
 
 pygame.init()
 
@@ -13,7 +30,7 @@ if random.randint(0, 1000) == 0:  # Easter eggs!
     pygame.display.set_caption(
         chr(127757) + chr(127758) + chr(127759) + "Worlde" + chr(127757) + chr(127758) + chr(127759))
 
-font = pygame.font.Font("FantasqueSansMono-Regular.ttf", 48)
+font = pygame.font.Font("fonts/FantasqueSansMono-Regular.ttf", 48)
 
 GREEN_COLOR = (49, 231, 34)
 YELLOW_COLOR = (255, 255, 85)
@@ -37,11 +54,11 @@ def render_word(word, pos):
     max_width = 0
     color = RESET_COLOR
     word = word.upper() \
-        .replace(wordle_api.GREEN, "g") \
-        .replace(wordle_api.YELLOW, "y") \
-        .replace(wordle_api.WHITE, "w") \
-        .replace(wordle_api.DARK, "d") \
-        .replace(wordle_api.RESET, "r")
+        .replace(re_wordle_api.GREEN, "g") \
+        .replace(re_wordle_api.YELLOW, "y") \
+        .replace(re_wordle_api.WHITE, "w") \
+        .replace(re_wordle_api.DARK, "d") \
+        .replace(re_wordle_api.RESET, "r")
     for w in word:
         if w.islower():
             color = color_by_code[w]
@@ -70,13 +87,13 @@ def gen_keyboard_line(line):
     for let in line:
         num = line[let]
         if num == -1:
-            text += wordle_api.RESET
+            text += re_wordle_api.RESET
         elif num == 0:
-            text += wordle_api.DARK
+            text += re_wordle_api.DARK
         elif num == 1:
-            text += wordle_api.YELLOW
+            text += re_wordle_api.YELLOW
         elif num == 2:
-            text += wordle_api.GREEN
+            text += re_wordle_api.GREEN
         else:
             raise IndexError("Number " + num + " is an invalid code")
         text += let
@@ -94,7 +111,7 @@ def render_keyboard(top, middle, bottom, pos):
 
 def run_game():
     play_again = False
-    wordle = wordle_api.Wordle()
+    wordle = re_wordle_api.Wordle()
     # change to pick_word_reasonable_length for more random lengths while being sensible
     # wordle.pick_word_from_length(5)
     wordle.pick_word_reasonable_length()
@@ -182,13 +199,13 @@ def run_game():
             render_keyboard(line_1, line_2, line_3, (115, 410))
         else:
             if wordle.guesses[-1] == wordle.word:
-                wy += render_word(f"{wordle_api.GREEN}CONGRATULATIONS!{wordle_api.RESET}", (wx, wy)) + 15
+                wy += render_word(f"{re_wordle_api.GREEN}CONGRATULATIONS!{re_wordle_api.RESET}", (wx, wy)) + 15
             else:
                 if interactable:
                     red_flash_end = time.time() + 2
-                wy += render_word(f"{wordle_api.YELLOW}INCORRECT{wordle_api.RESET}", (wx, wy)) + 15
-                wy += render_word(f"{wordle_api.WHITE}THE WORD WAS{wordle_api.RESET}", (wx, wy)) + 15
-                wy += render_word(wordle_api.GREEN + wordle.word + wordle_api.RESET, (wx, wy)) + 15
+                wy += render_word(f"{re_wordle_api.YELLOW}INCORRECT{re_wordle_api.RESET}", (wx, wy)) + 15
+                wy += render_word(f"{re_wordle_api.WHITE}THE WORD WAS{re_wordle_api.RESET}", (wx, wy)) + 15
+                wy += render_word(re_wordle_api.GREEN + wordle.word + re_wordle_api.RESET, (wx, wy)) + 15
             interactable = False
         pygame.display.update()
     return play_again
