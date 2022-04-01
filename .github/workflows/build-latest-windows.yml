@@ -30,23 +30,16 @@ jobs:
       - run: |
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pyinstaller
       #    python3 -m pip install pygame==1.9.6
       #    python3 -c "import pygame;print('hello')"
 
       - name: PyInstaller Windows ReWordle Console
-        uses: JackMcKew/pyinstaller-action-windows@main
-        with:
-            # Directory containing source code & .spec file (optional requirements.txt).
-            path: src # default is src
-            # Specify a file path for .spec file
-            spec: re_wordle_console.spec # optional, default is
+        run:
+          python3 -m PyInstaller src/re_wordle_console.spec
       - name: PyInstaller Windows ReWordle Windowed
-        uses: JackMcKew/pyinstaller-action-windows@main
-        with:
-            # Directory containing source code & .spec file (optional requirements.txt).
-            path: src # default is src
-            # Specify a file path for .spec file
-            spec: re_wordle_windowed.spec # optional, default is
+        run:
+          python3 -m PyInstaller src/re_wordle_windowed.spec
       - name: Echo
         run: |
           ls
@@ -92,21 +85,14 @@ jobs:
       - run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pyinstaller
 
       - name: PyInstaller Windows ReWordle Console
-        uses: JackMcKew/pyinstaller-action-windows@main
-        with:
-            # Directory containing source code & .spec file (optional requirements.txt).
-            path: src # default is src
-            # Specify a file path for .spec file
-            spec: re_wordle_console.spec # optional, default is
+        run:
+          python3 -m PyInstaller src/re_wordle_console.spec
       - name: PyInstaller Windows ReWordle Windowed
-        uses: JackMcKew/pyinstaller-action-windows@main
-        with:
-            # Directory containing source code & .spec file (optional requirements.txt).
-            path: src # default is src
-            # Specify a file path for .spec file
-            spec: re_wordle_windowed.spec # optional, default is
+        run:
+          python3 -m PyInstaller src/re_wordle_windowed.spec
       - name: Echo
         run: |
           ls
