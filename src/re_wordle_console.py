@@ -15,12 +15,21 @@ Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from colorama import Fore, Style
+import argparse
 import re_wordle_api
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--letters", type=int, help="Set number of letters", default=-1)
+
+args = parser.parse_args()
 
 re_wordle_api.show_license_notice()
 
 wordle = re_wordle_api.Wordle()
-wordle.pick_word_any_length()
+if args.letters == -1:
+    wordle.pick_word_reasonable_length()
+else:
+    wordle.pick_word_from_length(args.letters)
 
 print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 '''for x in range(1, 25):

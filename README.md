@@ -1,6 +1,15 @@
-#ReWordle
+# ReWordle
 ## Purpose
 To entertain.
+## Information
+By default, ReWordle picks words with between 2 and 7 letters.
+To play with a specific number of letters, run using the argument --letters
+```
+re_wordle_console --letters #
+re_wordle_windowed --letters #
+```
+where ```#``` is replaced with the number of letters you want.
+Of course, append .exe for Windows compiled versions
 ## Licensing
 Code is licensed under the **GPL-v3 license or any later version** which can be read
 in the attached [LICENSE.txt](LICENSE.txt) file, or online at

@@ -19,6 +19,12 @@ import re_wordle_api
 import random
 import string
 import time
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--letters", type=int, help="Set number of letters", default=-1)
+
+args = parser.parse_args()
 
 re_wordle_api.show_license_notice()
 
@@ -114,7 +120,10 @@ def run_game():
     wordle = re_wordle_api.Wordle()
     # change to pick_word_reasonable_length for more random lengths while being sensible
     # wordle.pick_word_from_length(5)
-    wordle.pick_word_reasonable_length()
+    if args.letters == -1:
+        wordle.pick_word_reasonable_length()
+    else:
+        wordle.pick_word_from_length(args.letters)
 
     print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 

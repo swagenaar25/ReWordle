@@ -81,6 +81,9 @@ class Wordle:
 
     def pick_word_from_length(self, length):
         self.gen_list(length)
+        if len(self.wordList) == 0:
+            print(f"No words found for length {length}")
+            self.gen_list(-1)
         self.word = random.choice(self.wordList)
         self.guesses = []
 
