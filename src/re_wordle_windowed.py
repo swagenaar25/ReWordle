@@ -32,7 +32,7 @@ pygame.init()
 
 screen = pygame.display.set_mode([600, 600])
 pygame.display.set_caption("Wordle")
-if random.randint(0, 1000) == 0:  # Easter eggs!
+if random.randint(0, 200) == 0:  # Easter eggs!
     pygame.display.set_caption(
         chr(127757) + chr(127758) + chr(127759) + "Worlde" + chr(127757) + chr(127758) + chr(127759))
 
@@ -51,6 +51,14 @@ color_by_code = {
     "d": DARK_COLOR,
     "r": RESET_COLOR
 }
+
+
+def width(word):
+    return (len(word)*25)+((len(word)-1)*12)
+
+
+def x_for_centering(word):
+    return int((screen.get_width() - width(word)) / 2)
 
 
 def render_word(word, pos):
@@ -111,8 +119,8 @@ def render_keyboard(top, middle, bottom, pos):
     y = pos[1]
     # Letter width 25
     y += render_word(gen_keyboard_line(top), (x, y)) + 15
-    y += render_word(gen_keyboard_line(middle), (x + 12, y)) + 15
-    y += render_word(gen_keyboard_line(bottom), (x + 37, y)) + 15
+    y += render_word(gen_keyboard_line(middle), (x + 18, y)) + 15
+    y += render_word(gen_keyboard_line(bottom), (x + 55, y)) + 15
 
 
 def run_game():
@@ -199,7 +207,7 @@ def run_game():
         if time.time() < red_flash_end:
             screen.fill((100, 0, 0))
 
-        wx = 20
+        wx = x_for_centering(wordle.word)
         wy = 20
         for guess in wordle.guesses:
             wy += render_word(wordle.generate_response(guess), (wx, wy)) + 15
@@ -208,12 +216,16 @@ def run_game():
             render_keyboard(line_1, line_2, line_3, (115, 410))
         else:
             if wordle.guesses[-1] == wordle.word:
+                wx = x_for_centering("CONGRATULATIONS!")
                 wy += render_word(f"{re_wordle_api.GREEN}CONGRATULATIONS!{re_wordle_api.RESET}", (wx, wy)) + 15
             else:
                 if interactable:
                     red_flash_end = time.time() + 2
+                wx = x_for_centering("INCORRECT")
                 wy += render_word(f"{re_wordle_api.YELLOW}INCORRECT{re_wordle_api.RESET}", (wx, wy)) + 15
+                wx = x_for_centering("THE WORD WAS")
                 wy += render_word(f"{re_wordle_api.WHITE}THE WORD WAS{re_wordle_api.RESET}", (wx, wy)) + 15
+                wx = x_for_centering(wordle.word)
                 wy += render_word(re_wordle_api.GREEN + wordle.word + re_wordle_api.RESET, (wx, wy)) + 15
             interactable = False
         pygame.display.update()
