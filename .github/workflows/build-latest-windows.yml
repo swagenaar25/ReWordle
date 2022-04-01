@@ -29,7 +29,7 @@ jobs:
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - run: |
           python3 -m pip install --upgrade pip
-          pip install -r src/requirements.txt
+          pip install -r requirements.txt
       #    python3 -m pip install pygame==1.9.6
       #    python3 -c "import pygame;print('hello')"
 
@@ -63,7 +63,7 @@ jobs:
           prerelease: false
           title: "Development Build - Windows"
           files: |
-            LICENSE
+            LICENSE.txt
             windows_binaries.zip
   build-x86:
     # The type of runner that the job will run on
@@ -83,7 +83,7 @@ jobs:
           architecture: 'x86' # optional x64 or x86. Defaults to x64 if not specified
       - run: |
           python -m pip install --upgrade pip
-          pip install -r src/requirements.txt
+          pip install -r requirements.txt
 
       - name: PyInstaller Windows ReWordle Console
         run:
@@ -115,5 +115,5 @@ jobs:
           prerelease: false
           title: "Development Build - Windows X86"
           files: |
-            LICENSE
+            LICENSE.txt
             windows_binaries_x86.zip

@@ -30,6 +30,7 @@ jobs:
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - run: |
           python3 -m pip install --upgrade pip
+          pip install -r requirements.txt
       #    python3 -m pip install pygame==1.9.6
       #    python3 -c "import pygame;print('hello')"
 
@@ -71,5 +72,5 @@ jobs:
           prerelease: false
           title: "Release Build - Linux"
           files: |
-            LICENSE
+            LICENSE.txt
             linux_binaries.zip
