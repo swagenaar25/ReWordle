@@ -57,6 +57,11 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+print(os.listdir(resource_path(".")))
+print(os.listdir(resource_path("assets")))
+print(os.listdir(resource_path("assets/fonts")))
+
+
 class Wordle:
 
     def __init__(self):
