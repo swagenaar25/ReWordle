@@ -8,5 +8,5 @@ in the attached [LICENSE.txt](LICENSE.txt) file, or online at
 
 Fantasque Sans Mono, the font used for this project is licensed
 under the **SIL Open Font License** which can be read in the
-attached [fonts/LICENSE.txt](fonts/LICENSE.txt) or online at
+attached [fonts/LICENSE.txt](assets/fonts/LICENSE.txt) or online at
 [http://scripts.sil.org/OFL](http://scripts.sil.org/OFL).

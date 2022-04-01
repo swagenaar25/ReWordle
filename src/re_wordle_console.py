@@ -14,7 +14,7 @@ Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 import re_wordle_api
 
 re_wordle_api.show_license_notice()

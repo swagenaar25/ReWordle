@@ -16,6 +16,8 @@ Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
 """
 import random
 from string import ascii_lowercase
+import os
+import sys
 
 # Color codes
 GREEN = "@"
@@ -43,8 +45,16 @@ Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+
 def show_license_notice():
     print(license_notice())
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    default = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    base_path = getattr(sys, '_MEIPASS', default)
+    return os.path.join(base_path, relative_path)
 
 
 class Wordle:
@@ -58,7 +68,7 @@ class Wordle:
     # Create word list
     def gen_list(self, length):
         words = []
-        lines = open('full_dictionary.txt').read().splitlines()
+        lines = open(resource_path('assets/full_dictionary.txt')).read().splitlines()
         for line in lines:
             if length == -1 or len(line) == length:
                 ok = True

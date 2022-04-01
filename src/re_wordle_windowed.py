@@ -30,7 +30,7 @@ if random.randint(0, 1000) == 0:  # Easter eggs!
     pygame.display.set_caption(
         chr(127757) + chr(127758) + chr(127759) + "Worlde" + chr(127757) + chr(127758) + chr(127759))
 
-font = pygame.font.Font("fonts/FantasqueSansMono-Regular.ttf", 48)
+font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"), 48)
 
 GREEN_COLOR = (49, 231, 34)
 YELLOW_COLOR = (255, 255, 85)
