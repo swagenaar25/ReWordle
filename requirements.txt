@@ -3,3 +3,4 @@ setuptools
 wheel==0.37.1
 colorama==0.4.4
 pygame==2.1.2
+pyinstaller @ https://github.com/pyinstaller/pyinstaller/archive/master.zip
