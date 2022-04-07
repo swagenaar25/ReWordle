@@ -96,6 +96,7 @@ class Wordle:
         self.pick_word_any_length()
         while len(self.word) < 2 or len(self.word) > 7:
             self.pick_word_any_length()
+        self.gen_list(len(self.word))
 
     def is_valid_guess(self, guess):
         return guess in self.wordList
@@ -149,3 +150,10 @@ class Wordle:
             else:
                 grey.append(guess_word[i])
         return grey, yellow, green
+
+
+if __name__ == "__main__":  # If we get run, count all words
+    for i in range(20):
+        tmp = Wordle()
+        tmp.gen_list(i)
+        print(f"{len(tmp.wordList)} words of length [{i}]: {tmp.wordList}")

@@ -1,4 +1,11 @@
 alpine
+gothic
+iceland
+cyclops
+amongus
+# YES, I know I should be capitalized, but otherwise it won't be picked up
+i
+a
 #CUSTOM WORDS ABOVE THIS LINE
 aardvark
 aardvark's
@@ -26178,17 +26185,9 @@ lush
 lusher
 lushes
 lushest
-lust
-lust's
-lusted
 luster
 luster's
-lustier
-lustiest
-lusting
 lustrous
-lusts
-lusty
 lute
 lute's
 lutes
@@ -26208,17 +26207,12 @@ lymph
 lymph's
 lymphatic
 lymphatics
-lynch
-lynched
-lynches
-lynching
 lyre
 lyre's
 lyres
 lyric
 lyrical
 lyrics
-m
 ma
 ma'am
 ma's
