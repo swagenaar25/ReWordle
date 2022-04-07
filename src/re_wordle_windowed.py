@@ -133,12 +133,6 @@ def run_game():
     else:
         wordle.pick_word_from_length(args.letters)
 
-    # Begin tests
-    f = open(re_wordle_api.resource_path('assets/full_dictionary.txt'), "w")
-    f.write("python\nhello\nworld\n")
-    f.close()
-    # End tests
-
     print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 
     # Setup keyboard
