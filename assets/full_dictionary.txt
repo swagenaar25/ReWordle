@@ -3,6 +3,8 @@ gothic
 iceland
 cyclops
 amongus
+unplug
+bleater
 # YES, I know I should be capitalized, but otherwise it won't be picked up
 i
 a
