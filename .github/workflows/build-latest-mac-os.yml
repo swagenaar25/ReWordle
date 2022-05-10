@@ -47,11 +47,15 @@ jobs:
         with:
           name: packaged-binaries
           path: dist
+      - name: Zip up app
+        run: cd dist && cp ../LICENSE.txt ./LICENSE.txt && cp ../README.md ./README.md && zip -r9 macOS_binaries.zip rewordle_windowed.app rewordle_console LICENSE.txt README.md
+      - name: Echo directory 2
+        run: ls; ls dist
       #zip up files
-      - uses: papeloto/action-zip@v1
-        with:
-          files: dist/re_wordle_console dist/re_wordle_windowed LICENSE.txt README.md
-          dest: macOS_binaries.zip
+      #- uses: papeloto/action-zip@v1
+      #  with:
+      #    files: dist/re_wordle_console dist/re_wordle_windowed LICENSE.txt README.md
+      #    dest: macOS_binaries.zip
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -61,4 +65,4 @@ jobs:
           title: "Development Build - MacOS"
           files: |
             LICENSE.txt
-            macOS_binaries.zip
+            dist/macOS_binaries.zip
