@@ -372,7 +372,7 @@ def run_game():
         wordle.pick_word_reasonable_length()
     else:
         wordle.pick_word_from_length(config.num_letters)
-    print(wordle.word)
+    # print(wordle.word)
 
     print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 
