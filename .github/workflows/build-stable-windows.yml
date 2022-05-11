@@ -53,7 +53,7 @@ jobs:
       #zip up files
       - uses: papeloto/action-zip@v1
         with:
-          files: dist/re_wordle_console.exe dist/re_wordle_windowed.exe LICENSE.txt README.md
+          files: dist/rewordle_console.exe dist/rewordle_windowed.exe LICENSE.txt README.md
           dest: windows_binaries.zip
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
@@ -105,7 +105,7 @@ jobs:
       #zip up files
       - uses: papeloto/action-zip@v1
         with:
-          files: dist/re_wordle_console.exe dist/rewordle_windowed.exe LICENSE.txt README.md
+          files: dist/rewordle_console.exe dist/rewordle_windowed.exe LICENSE.txt README.md
           dest: windows_binaries_x86.zip
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"

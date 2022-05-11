@@ -62,7 +62,7 @@ jobs:
       #zip up files
       - uses: papeloto/action-zip@v1
         with:
-          files: src/dist/linux/re_wordle_console src/dist/linux/re_wordle_windowed LICENSE.txt README.md
+          files: src/dist/linux/rewordle_console src/dist/linux/rewordle_windowed LICENSE.txt README.md
           dest: linux_binaries.zip
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
