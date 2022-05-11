@@ -6,8 +6,8 @@ name: GenerateStableMacOSRelease
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches:
-      - stable
+    tags:
+      - v*
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -59,9 +59,9 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "stable-macOS"
+          automatic_release_tag: "macOS-${{ github.ref }}"
           prerelease: false
-          title: "Release Build - MacOS"
+          title: "Release ${{ github.ref }} - MacOS"
           files: |
             LICENSE.txt
             dist/macOS_binaries.zip

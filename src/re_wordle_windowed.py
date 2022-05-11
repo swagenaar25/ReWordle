@@ -15,6 +15,7 @@ Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import typing
+import urllib.error
 
 import pygame
 import re_wordle_api
@@ -42,13 +43,19 @@ class Config:
     def __init__(self):
         self.num_letters = 0
         self.window_size = 600
+        self.language = "en"
         self._testing_wordle = re_wordle_api.Wordle()
 
     def validate(self):
         self.num_letters = max(0, self.num_letters)
         self.window_size = max(100, min(self.window_size, maximum_height))
-        while self.num_letters != 0 and len(self._testing_wordle.gen_list(self.num_letters)) == 0:
-            self.num_letters -= 1
+
+        self._testing_wordle.language = self.language
+        self._testing_wordle.load_language_options()
+        self.language = self._testing_wordle.language
+
+    def valid_number_letters(self):
+        return self.num_letters == 0 or len(self._testing_wordle.gen_list(self.num_letters)) != 0
 
     def update_window(self):
         global screen
@@ -68,6 +75,8 @@ class Config:
                         self.num_letters = int(v)
                     elif k == "window_size":
                         self.window_size = int(v)
+                    elif k == "language":
+                        self.language = v
                 except ValueError:
                     pass
         except FileNotFoundError:
@@ -75,7 +84,7 @@ class Config:
 
     def save(self):
         f = open(re_wordle_api.external_path("rewordle.conf"), "w")
-        f.write(f"num_letters={self.num_letters}\nwindow_size={self.window_size}\n")
+        f.write(f"num_letters={self.num_letters}\nwindow_size={self.window_size}\nlanguage={self.language}\n")
         f.close()
 
     def reset(self):
@@ -146,7 +155,6 @@ def required_horizontal_space():
 
 config = Config()
 config.load()
-
 
 def fit_font():
     global font_size, letter_width, letter_height, horizontal_spacing, vertical_spacing, font, options_font
@@ -317,7 +325,12 @@ options_text = "OPTIONS"
 options_bounds = None
 
 
-def run_options(wordle):
+def run_options(wordle: re_wordle_api.Wordle) -> bool:
+    """ Display options window
+
+    :param wordle: Wordle instance to operate on
+    :return: Language change
+    """
     kg = True
     exit_bounds = None
     reset_bounds = None
@@ -327,8 +340,13 @@ def run_options(wordle):
     letter_minus_bounds = None
     letter_plus_bounds = None
 
+    language_bounds = None
+
     download_list_bounds = None
-    green_until = 0
+    download_green_until = 0
+    download_red_until = 0
+
+    original_language = wordle.language
     while kg:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -360,9 +378,17 @@ def run_options(wordle):
                 elif letter_plus_bounds is not None and letter_plus_bounds.collidepoint(mx, my):
                     config.num_letters += 1
                     config.validate()
+                elif language_bounds is not None and language_bounds.collidepoint(mx, my):
+                    wordle.load_language_options()
+                    languages = list(wordle.languages.keys())
+                    wordle.language = languages[(languages.index(wordle.language)+1) % len(languages)]
                 elif download_list_bounds is not None and download_list_bounds.collidepoint(mx, my):
-                    wordle.download_word_list()
-                    green_until = time.time() + 1
+                    try:
+                        wordle.download_language_data()
+                        config.validate()
+                    except urllib.error.URLError:
+                        download_red_until = time.time() + 1
+                    download_green_until = time.time() + 1
         screen.fill((0, 0, 0))
         exit_bounds = plain_text(5, letter_height * 0.25, "X", (255, 255, 255), options_font, outline=True)
 
@@ -386,25 +412,41 @@ def run_options(wordle):
         length_str = str(config.num_letters)
         if config.num_letters == 0:
             length_str = "RANDOM"
-        plain_text(10 + (gap / 2) + start_offset, letter_height * 3.75, length_str, (255, 255, 255),
+        plain_text(10 + (gap / 2) + start_offset, letter_height * 3.75, length_str,
+                   (255, 255, 255) if config.valid_number_letters() else (255, 0, 0),
                    options_font, centered=True)
         letter_plus_bounds = plain_text(5 + gap + start_offset, letter_height * 3.5, "+", (255, 255, 255), options_font,
                                         outline=True)
 
+        # Language selection
+        _, _, start_offset, _ = plain_text(5, letter_height * 4.5, "Language: ", (255, 255, 255), options_font)
+        language_bounds = plain_text(5 + start_offset, letter_height * 4.5,
+                                     wordle.get_language_name(),
+                                     (255, 0, 0) if time.time() < download_red_until else (
+                                         GREEN_COLOR if time.time() < download_green_until else (255, 255, 255)),
+                                     options_font,
+                                     outline=True)
+
         # Word list download
-        download_list_bounds = plain_text(5, letter_height * 4.5,
-                                          "DOWNLOAD WORD LIST",
-                                          GREEN_COLOR if time.time() < green_until else (255, 255, 255),
+        download_list_bounds = plain_text(5, letter_height * 5.5,
+                                          "DOWNLOAD LANGUAGE DATA",
+                                          (255, 0, 0) if time.time() < download_red_until else (
+                                              GREEN_COLOR if time.time() < download_green_until else (255, 255, 255)),
                                           options_font,
                                           outline=True)
         pygame.display.update()
+    config.language = wordle.language
     config.save()
+    return wordle.language != original_language
 
 
 def run_game():
     global options_bounds
     play_again = False
     wordle = re_wordle_api.Wordle()
+    wordle.language = config.language
+    wordle.load_language_options()
+    config.language = wordle.language
     # change to pick_word_reasonable_length for more random lengths while being sensible
     # wordle.pick_word_from_length(5)
     if config.num_letters == 0:
@@ -485,10 +527,16 @@ def run_game():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
                 if options_bounds is not None and options_bounds.collidepoint(mx, my):
-                    run_options(wordle)
-                    if config.num_letters != 0 and config.num_letters != len(wordle.word):
+                    changed_language = run_options(wordle)
+                    if changed_language or (config.num_letters != 0 and config.num_letters != len(wordle.word)):
+                        prev_lang = wordle.language
                         wordle = re_wordle_api.Wordle()
-                        wordle.pick_word_from_length(config.num_letters)
+                        wordle.language = prev_lang
+                        wordle.load_language_options()
+                        if config.num_letters > 0:
+                            wordle.pick_word_from_length(config.num_letters)
+                        else:
+                            wordle.pick_word_reasonable_length()
                         print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
                         # Setup keyboard
                         l1 = "QWERTYUIOP"
@@ -547,6 +595,7 @@ def run_game():
                 wy += render_word(re_wordle_api.GREEN + wordle.word + re_wordle_api.RESET, (wx, wy)) + vertical_spacing
             interactable = False
         pygame.display.update()
+    config.save()
     return play_again
 
 

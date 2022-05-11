@@ -6,8 +6,8 @@ name: GenerateStableWindowsRelease
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches:
-      - stable
+    tags:
+      - v*
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -59,9 +59,9 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "stable-windows"
+          automatic_release_tag: "windows-${{ github.ref }}"
           prerelease: false
-          title: "Release Build - Windows"
+          title: "Release ${{ github.ref }} - Windows"
           files: |
             LICENSE.txt
             windows_binaries.zip
@@ -111,9 +111,9 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "stable-windows-x86"
+          automatic_release_tag: "windows-x86-${{ github.ref }}"
           prerelease: false
-          title: "Release Build - Windows X86"
+          title: "Release ${{ github.ref }} - Windows X86"
           files: |
             LICENSE.txt
             windows_binaries_x86.zip

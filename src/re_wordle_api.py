@@ -78,17 +78,62 @@ class Wordle:
         self.word = None
         self.correct = False
         self.guesses = []
-        self.local_list = False
+        self.language = ""
+        self.languages = {}
+        self._external_language_file_location = os.path.abspath(external_path(".rewordle_lang/languages.txt"))
+        self.load_language_options()
 
-    def download_word_list(self):  # noqa
-        url = "https://raw.githubusercontent.com/swagenaar25/ReWordle/master/assets/full_dictionary.txt"
-        urllib.request.urlretrieve(url, external_path(".rewordle_list.txt"))
+    def get_language_name(self):
+        try:
+            return self.languages[self.language]
+        except KeyError:
+            return "UNKNOWN"
 
-    def word_list_location(self):  # noqa
-        if os.path.exists(external_path(".rewordle_list.txt")):
-            return os.path.abspath(external_path(".rewordle_list.txt"))
+    def external_language_location(self, language):  # noqa
+        return os.path.abspath(external_path(f".rewordle_lang/{language}"))
+
+    def load_language_options(self) -> bool:
+        """Load language options from disk
+
+        :return: Language changed
+        """
+        f = open(self.language_list_location())
+        languages = f.read().split("\n")
+        f.close()
+        self.languages.clear()
+        for line in languages:
+            try:
+                k, v = line.split(":")
+                self.languages[k] = v
+            except ValueError:
+                print(f"Invalid language data with line {line}")
+        if self.language not in self.languages:
+            self.language = list(self.languages.keys())[0]
+            return True
         else:
-            return os.path.abspath(resource_path("assets/full_dictionary.txt"))
+            return False
+
+    def download_language_data(self):
+        list_url = f"https://raw.githubusercontent.com/swagenaar25/ReWordle/master/assets/languages.txt"
+        urllib.request.urlretrieve(list_url, self._external_language_file_location)
+        ret = self.load_language_options()
+        for language in self.languages:
+            urllib.request.urlretrieve(
+                f"https://raw.githubusercontent.com/swagenaar25/ReWordle/master/assets/lang/{language}.txt",
+                self.external_language_location(language))
+        return ret
+
+    def language_list_location(self):
+        if os.path.exists(self._external_language_file_location):
+            return self._external_language_file_location
+        else:
+            return os.path.abspath(resource_path("assets/languages.txt"))
+
+    def word_list_location(self):
+        if os.path.exists(self.external_language_location(self.language)):
+            return self.external_language_location(self.language)
+        else:
+            return os.path.abspath(resource_path(f"assets/lang/{self.language}.txt"))
 
     # Create word list
     def gen_list(self, length):
