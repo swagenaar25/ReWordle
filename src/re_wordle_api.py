@@ -18,6 +18,8 @@ import random
 from string import ascii_lowercase
 import os
 import sys
+import urllib.request
+import os
 
 # Color codes
 GREEN = "@"
@@ -76,11 +78,23 @@ class Wordle:
         self.word = None
         self.correct = False
         self.guesses = []
+        self.local_list = False
+
+    def download_word_list(self):  # noqa
+        url = "https://raw.githubusercontent.com/swagenaar25/ReWordle/master/assets/full_dictionary.txt"
+        urllib.request.urlretrieve(url, external_path(".rewordle_list.txt"))
+
+    def word_list_location(self):  # noqa
+        if os.path.exists(external_path(".rewordle_list.txt")):
+            return os.path.abspath(external_path(".rewordle_list.txt"))
+        else:
+            return os.path.abspath(resource_path("assets/full_dictionary.txt"))
 
     # Create word list
     def gen_list(self, length):
         words = []
-        lines = open(resource_path('assets/full_dictionary.txt')).read().splitlines()
+        print(self.word_list_location())
+        lines = open(resource_path(self.word_list_location())).read().splitlines()
         for line in lines:
             if length == -1 or len(line) == length:
                 ok = True

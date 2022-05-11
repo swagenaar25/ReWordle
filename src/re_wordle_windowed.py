@@ -299,7 +299,7 @@ def get_amongus(offset) -> pygame.Surface:
            ##..""".replace("\t", "").replace(" ", "")
     surf = pygame.Surface((4, 4))
     lines = pattern.split("\n")
-    body_color = colorsys.hsv_to_rgb((time.time()/15)+offset, 1, 255)
+    body_color = colorsys.hsv_to_rgb((time.time() / 15) + offset, 1, 255)
     for x in range(4):
         for y in range(4):
             c = lines[y][x]
@@ -317,7 +317,7 @@ options_text = "OPTIONS"
 options_bounds = None
 
 
-def run_options():
+def run_options(wordle):
     kg = True
     exit_bounds = None
     reset_bounds = None
@@ -326,6 +326,9 @@ def run_options():
 
     letter_minus_bounds = None
     letter_plus_bounds = None
+
+    download_list_bounds = None
+    green_until = 0
     while kg:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -357,6 +360,9 @@ def run_options():
                 elif letter_plus_bounds is not None and letter_plus_bounds.collidepoint(mx, my):
                     config.num_letters += 1
                     config.validate()
+                elif download_list_bounds is not None and download_list_bounds.collidepoint(mx, my):
+                    wordle.download_word_list()
+                    green_until = time.time() + 1
         screen.fill((0, 0, 0))
         exit_bounds = plain_text(5, letter_height * 0.25, "X", (255, 255, 255), options_font, outline=True)
 
@@ -384,6 +390,13 @@ def run_options():
                    options_font, centered=True)
         letter_plus_bounds = plain_text(5 + gap + start_offset, letter_height * 3.5, "+", (255, 255, 255), options_font,
                                         outline=True)
+
+        # Word list download
+        download_list_bounds = plain_text(5, letter_height * 4.5,
+                                          "DOWNLOAD WORD LIST",
+                                          GREEN_COLOR if time.time() < green_until else (255, 255, 255),
+                                          options_font,
+                                          outline=True)
         pygame.display.update()
     config.save()
 
@@ -472,7 +485,7 @@ def run_game():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
                 if options_bounds is not None and options_bounds.collidepoint(mx, my):
-                    run_options()
+                    run_options(wordle)
                     if config.num_letters != 0 and config.num_letters != len(wordle.word):
                         wordle = re_wordle_api.Wordle()
                         wordle.pick_word_from_length(config.num_letters)
@@ -510,7 +523,8 @@ def run_game():
         ind = 0
         for guess in wordle.guesses:
             if guess == "sus" or guess == "amongus" or guess == "amogus" or guess == "impostor":
-                screen.blit(pygame.transform.scale(get_amongus(ind/6), (letter_height, letter_height)), (wx-letter_height, wy))
+                screen.blit(pygame.transform.scale(get_amongus(ind / 6), (letter_height, letter_height)),
+                            (wx - letter_height, wy))
             ind += 1
             wy += render_word(wordle.generate_response(guess), (wx, wy)) + vertical_spacing
         if len(wordle.guesses) < 6 and (len(wordle.guesses) == 0 or wordle.guesses[-1] != wordle.word):
