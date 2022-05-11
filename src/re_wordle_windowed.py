@@ -21,7 +21,7 @@ import re_wordle_api
 import random
 import string
 import time
-import argparse
+import colorsys
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument("--letters", type=int, help="Set number of letters", default=-1)
@@ -287,6 +287,32 @@ def render_keyboard(top, middle, bottom, pos):
     y += render_word(bottom_line, (x_for_centering(bottom_line), y)) + vertical_spacing
 
 
+def get_amongus(offset) -> pygame.Surface:
+    """ Create amongus
+
+    :return: Amongus surface
+    """
+    pattern = \
+        """##..
+           %##..
+           ###..
+           ##..""".replace("\t", "").replace(" ", "")
+    surf = pygame.Surface((4, 4))
+    lines = pattern.split("\n")
+    body_color = colorsys.hsv_to_rgb((time.time()/15)+offset, 1, 255)
+    for x in range(4):
+        for y in range(4):
+            c = lines[y][x]
+            color = (0, 0, 0)
+            if c == "#":
+                color = (int(body_color[0]), int(body_color[1]), int(body_color[2]))
+            elif c == "%":
+                color = (0, 255, 255)
+            surf.set_at((x, y), color)
+    surf.set_colorkey((0, 0, 0))
+    return surf
+
+
 options_text = "OPTIONS"
 options_bounds = None
 
@@ -332,9 +358,9 @@ def run_options():
                     config.num_letters += 1
                     config.validate()
         screen.fill((0, 0, 0))
-        exit_bounds = plain_text(5, letter_height*0.25, "X", (255, 255, 255), options_font, outline=True)
+        exit_bounds = plain_text(5, letter_height * 0.25, "X", (255, 255, 255), options_font, outline=True)
 
-        reset_bounds = plain_text(5, letter_height*1.0, "RESET", (255, 255, 255), options_font, outline=True)
+        reset_bounds = plain_text(5, letter_height * 1.0, "RESET", (255, 255, 255), options_font, outline=True)
 
         # Window size
         _, _, start_offset, _ = plain_text(5, letter_height * 2.5, "Window size: ", (255, 255, 255), options_font)
@@ -467,6 +493,7 @@ def run_game():
         screen.fill((0, 0, 0))
         if time.time() < red_flash_end:
             screen.fill((100, 0, 0))
+
         # Options button
         options_bounds = plain_text(5,
                                     5,
@@ -474,11 +501,15 @@ def run_game():
                                     (255, 255, 255),
                                     options_font,
                                     outline=True)
-        # Text
 
+        # Text
         wx = x_for_centering(wordle.word)
         wy = int((letter_height / 5) * 2)
+        ind = 0
         for guess in wordle.guesses:
+            if guess == "sus" or guess == "amongus" or guess == "amogus" or guess == "impostor":
+                screen.blit(pygame.transform.scale(get_amongus(ind/6), (letter_height, letter_height)), (wx-letter_height, wy))
+            ind += 1
             wy += render_word(wordle.generate_response(guess), (wx, wy)) + vertical_spacing
         if len(wordle.guesses) < 6 and (len(wordle.guesses) == 0 or wordle.guesses[-1] != wordle.word):
             render_word(typed_word + " " * (len(wordle.word) - len(typed_word)), (wx, wy))

@@ -11,6 +11,7 @@ i
 a
 seismic
 mote
+sus
 #CUSTOM WORDS ABOVE THIS LINE
 aardvark
 aardvark's
