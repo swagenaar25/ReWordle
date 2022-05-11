@@ -141,7 +141,7 @@ def required_vertical_space():
 
 
 def required_horizontal_space():
-    return width("A" * 16)
+    return width("A" * 18)
 
 
 config = Config()
@@ -419,6 +419,7 @@ def run_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 kg = False
+                play_again = False
             elif event.type == pygame.KEYDOWN:
                 if interactable:
                     if event.key == pygame.K_BACKSPACE:
@@ -475,6 +476,7 @@ def run_game():
                     if config.num_letters != 0 and config.num_letters != len(wordle.word):
                         wordle = re_wordle_api.Wordle()
                         wordle.pick_word_from_length(config.num_letters)
+                        print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
                         # Setup keyboard
                         l1 = "QWERTYUIOP"
                         l2 = "ASDFGHJKL"

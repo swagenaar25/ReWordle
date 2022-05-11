@@ -12,6 +12,9 @@ a
 seismic
 mote
 sus
+senegal
+epoxy
+neurophysiological
 #CUSTOM WORDS ABOVE THIS LINE
 aardvark
 aardvark's
@@ -3018,7 +3021,7 @@ balked
 balking
 balks
 ball
-ball's
+balls
 ballad
 ballad's
 ballads
@@ -33194,6 +33197,7 @@ poop's
 pooped
 pooping
 poops
+piss
 poor
 poorer
 poorest
