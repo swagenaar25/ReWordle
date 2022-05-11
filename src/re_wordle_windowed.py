@@ -91,6 +91,7 @@ class Config:
         default = self.__class__()
         self.window_size = default.window_size
         self.num_letters = default.num_letters
+        self.language = default.language
         del default
 
 
@@ -364,6 +365,7 @@ def run_options(wordle: re_wordle_api.Wordle) -> bool:
                 elif reset_bounds is not None and reset_bounds.collidepoint(mx, my):
                     config.reset()
                     config.validate()
+                    wordle.language = config.language
                 elif window_minus_bounds is not None and window_minus_bounds.collidepoint(mx, my):
                     config.window_size -= size_change
                     config.validate()
@@ -422,8 +424,7 @@ def run_options(wordle: re_wordle_api.Wordle) -> bool:
         _, _, start_offset, _ = plain_text(5, letter_height * 4.5, "Language: ", (255, 255, 255), options_font)
         language_bounds = plain_text(5 + start_offset, letter_height * 4.5,
                                      wordle.get_language_name(),
-                                     (255, 0, 0) if time.time() < download_red_until else (
-                                         GREEN_COLOR if time.time() < download_green_until else (255, 255, 255)),
+                                     (255, 255, 255),
                                      options_font,
                                      outline=True)
 

@@ -90,7 +90,7 @@ class Wordle:
             return "UNKNOWN"
 
     def external_language_location(self, language):  # noqa
-        return os.path.abspath(external_path(f".rewordle_lang/{language}"))
+        return os.path.abspath(external_path(f".rewordle_lang/{language}.txt"))
 
     def load_language_options(self) -> bool:
         """Load language options from disk
@@ -115,6 +115,7 @@ class Wordle:
 
     def download_language_data(self):
         list_url = f"https://raw.githubusercontent.com/swagenaar25/ReWordle/master/assets/languages.txt"
+        os.makedirs(os.path.dirname(self._external_language_file_location), exist_ok=True)
         urllib.request.urlretrieve(list_url, self._external_language_file_location)
         ret = self.load_language_options()
         for language in self.languages:
@@ -136,7 +137,7 @@ class Wordle:
             return os.path.abspath(resource_path(f"assets/lang/{self.language}.txt"))
 
     # Create word list
-    def gen_list(self, length):
+    def gen_list(self, length, print_invalid=False):
         words = []
         lines = open(resource_path(self.word_list_location())).read().splitlines()
         for line in lines:
@@ -147,6 +148,8 @@ class Wordle:
                         ok = False
                 if ok:
                     words.append(line)
+                elif print_invalid:
+                    print(f"Bad word: {line}")
         self.wordList = words.copy()
         return words
 

@@ -1,2 +1,2 @@
 en:English
-lat:Latin (WIP)
+lat:Latin (Lingua latina)
