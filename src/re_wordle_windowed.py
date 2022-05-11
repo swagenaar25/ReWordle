@@ -14,6 +14,8 @@ Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+import typing
+
 import pygame
 import re_wordle_api
 import random
@@ -21,14 +23,67 @@ import string
 import time
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--letters", type=int, help="Set number of letters", default=-1)
+# parser = argparse.ArgumentParser()
+# parser.add_argument("--letters", type=int, help="Set number of letters", default=-1)
 
-args = parser.parse_args()
+# args = parser.parse_args()
 
 re_wordle_api.show_license_notice()
 
 pygame.init()
+
+maximum_height = 0
+for _, height in pygame.display.list_modes():
+    maximum_height = max(maximum_height, height)
+
+
+class Config:
+
+    def __init__(self):
+        self.num_letters = 0
+        self.window_size = 600
+        self._testing_wordle = re_wordle_api.Wordle()
+
+    def validate(self):
+        self.num_letters = max(0, self.num_letters)
+        self.window_size = max(100, min(self.window_size, maximum_height))
+        while self.num_letters != 0 and len(self._testing_wordle.gen_list(self.num_letters)) == 0:
+            self.num_letters -= 1
+
+    def update_window(self):
+        global screen
+        screen = pygame.display.set_mode((self.window_size, self.window_size))
+        fit_font()
+
+    def load(self):
+        try:
+            f = open(re_wordle_api.external_path("rewordle.conf"))
+            contents = f.read()
+            f.close()
+            lines = contents.split("\n")
+            for line in lines:
+                try:
+                    k, v = line.split("=")
+                    if k == "num_letters":
+                        self.num_letters = int(v)
+                    elif k == "window_size":
+                        self.window_size = int(v)
+                except ValueError:
+                    pass
+        except FileNotFoundError:
+            pass
+
+    def save(self):
+        f = open(re_wordle_api.external_path("rewordle.conf"), "w")
+        f.write(f"num_letters={self.num_letters}\nwindow_size={self.window_size}\n")
+        f.close()
+
+    def reset(self):
+        default = self.__class__()
+        self.window_size = default.window_size
+        self.num_letters = default.num_letters
+        del default
+
 
 screen = pygame.display.set_mode([600, 600])
 pygame.display.set_caption("Wordle")
@@ -36,7 +91,96 @@ if random.randint(0, 200) == 0:  # Easter eggs!
     pygame.display.set_caption(
         chr(127757) + chr(127758) + chr(127759) + "Worlde" + chr(127757) + chr(127758) + chr(127759))
 
-font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"), 48)
+font_size = 48  # Fits default window, but will auto-adjust
+font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"), font_size)
+options_font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"),
+                                int(font_size / 2))
+
+
+def letter_stats(myfont):
+    x = 0
+    y = 0
+    max_height = 0
+    max_width = 0
+    word = "QWERTYUIOPASDFGHJKLZXCVBNM"
+    for w in word:
+        letter_surf = myfont.render(w, True, (255, 255, 255))
+        letter_rect = letter_surf.get_rect()
+        letter_rect.x = x
+        letter_rect.y = y
+
+        underscore_surf = myfont.render("_", True, (255, 255, 255))
+        underscore_rect = underscore_surf.get_rect()
+        underscore_rect.centerx = letter_rect.centerx
+        underscore_rect.bottom = letter_rect.bottom
+
+        x += underscore_rect.width * 1.5
+        max_height = max(max_height, max(letter_rect.height, underscore_rect.height))
+        max_width = max(max_width, max(letter_rect.width, underscore_rect.width))
+    return max_width, max_height
+
+
+letter_width, letter_height = letter_stats(font)
+vertical_spacing = letter_height / (10 / 3)
+horizontal_spacing = letter_width / 2
+
+
+def width(word):
+    word = re_wordle_api.clear_color_codes(word)
+    return (len(word) * letter_width) + ((len(word) - 1) * horizontal_spacing)
+
+
+def x_for_centering(word):
+    return int((screen.get_width() - width(word)) / 2)
+
+
+def required_vertical_space():
+    # 20 padding at top, 10 at bottom
+    return ((letter_height / 5) * 3) + (
+            (letter_height + vertical_spacing) * 9) - vertical_spacing  # we don't need extra spacing at the end
+
+
+def required_horizontal_space():
+    return width("A" * 16)
+
+
+config = Config()
+config.load()
+
+
+def fit_font():
+    global font_size, letter_width, letter_height, horizontal_spacing, vertical_spacing, font, options_font
+    # Calculate required font size for window size
+    # Shrink first
+    while required_vertical_space() > config.window_size or required_horizontal_space() > config.window_size:
+        # global font_size, font, letter_height, letter_width, horizontal_spacing, vertical_spacing
+        font_size -= 1
+        test_font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"),
+                                     font_size)
+        letter_width, letter_height = letter_stats(test_font)
+        vertical_spacing = letter_height / (10 / 3)
+        horizontal_spacing = letter_width / 2
+
+    # Expand
+    while required_vertical_space() < config.window_size and required_horizontal_space() < config.window_size:
+        # global font_size, font, letter_height, letter_width, horizontal_spacing, vertical_spacing
+        font_size += 1
+        test_font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"),
+                                     font_size)
+        letter_width, letter_height = letter_stats(test_font)
+        vertical_spacing = letter_height / (10 / 3)
+        horizontal_spacing = letter_width / 2
+
+    font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"), font_size)
+    options_font = pygame.font.Font(re_wordle_api.resource_path("assets/fonts/FantasqueSansMono-Regular.ttf"),
+                                    int(font_size / 2))
+    letter_width, letter_height = letter_stats(font)
+    vertical_spacing = letter_height / (10 / 3)  # noqa
+    horizontal_spacing = letter_width / 2  # noqa
+
+
+fit_font()
+config.validate()
 
 GREEN_COLOR = (49, 231, 34)
 YELLOW_COLOR = (255, 255, 85)
@@ -51,14 +195,6 @@ color_by_code = {
     "d": DARK_COLOR,
     "r": RESET_COLOR
 }
-
-
-def width(word):
-    return (len(word)*25)+((len(word)-1)*12)
-
-
-def x_for_centering(word):
-    return int((screen.get_width() - width(word)) / 2)
 
 
 def render_word(word, pos):
@@ -90,10 +226,33 @@ def render_word(word, pos):
         screen.blit(letter_surf, letter_rect)
         screen.blit(underscore_surf, underscore_rect)
 
-        x += underscore_rect.width + 12
+        x += underscore_rect.width * 1.5
         max_height = max(max_height, max(letter_rect.height, underscore_rect.height))
         max_width = max(max_width, max(letter_rect.width, underscore_rect.width))
+    # print(f"max_height:{max_height}, max_width:{max_width}")
     return max_height
+
+
+def plain_text(x: int | float, y: int | float, text: str, color: typing.Tuple[int, int, int], myfont: pygame.font.Font,
+               centered: bool = False, outline: bool = False):
+    text_surf = myfont.render(text, True, color)
+    text_rect = text_surf.get_rect()
+    if centered:
+        text_rect.centerx = x
+        text_rect.centery = y
+    else:
+        text_rect.x = x
+        text_rect.y = y
+    screen.blit(text_surf, text_rect)
+    if outline:
+        box_rect = pygame.rect.Rect(text_rect.x - 2, text_rect.y - 2,
+                                    text_rect.width + 4, text_rect.height + 4)
+        pygame.draw.rect(screen,
+                         (255, 255, 255),
+                         box_rect,
+                         width=1)
+        return box_rect
+    return text_rect
 
 
 def gen_keyboard_line(line):
@@ -118,20 +277,102 @@ def render_keyboard(top, middle, bottom, pos):
     x = pos[0]
     y = pos[1]
     # Letter width 25
-    y += render_word(gen_keyboard_line(top), (x, y)) + 15
-    y += render_word(gen_keyboard_line(middle), (x + 18, y)) + 15
-    y += render_word(gen_keyboard_line(bottom), (x + 55, y)) + 15
+    top_line = gen_keyboard_line(top)
+    y += render_word(top_line, (x_for_centering(top_line), y)) + vertical_spacing
+
+    middle_line = gen_keyboard_line(middle)
+    y += render_word(middle_line, (x_for_centering(middle_line), y)) + vertical_spacing
+
+    bottom_line = gen_keyboard_line(bottom)
+    y += render_word(bottom_line, (x_for_centering(bottom_line), y)) + vertical_spacing
+
+
+options_text = "OPTIONS"
+options_bounds = None
+
+
+def run_options():
+    kg = True
+    exit_bounds = None
+    reset_bounds = None
+    window_minus_bounds = None
+    window_plus_bounds = None
+
+    letter_minus_bounds = None
+    letter_plus_bounds = None
+    while kg:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                kg = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    kg = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mx, my = pygame.mouse.get_pos()
+                size_change = 10
+                if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                    size_change = 50
+                if exit_bounds is not None and exit_bounds.collidepoint(mx, my):
+                    kg = False
+                elif reset_bounds is not None and reset_bounds.collidepoint(mx, my):
+                    config.reset()
+                    config.validate()
+                elif window_minus_bounds is not None and window_minus_bounds.collidepoint(mx, my):
+                    config.window_size -= size_change
+                    config.validate()
+                    config.update_window()
+                elif window_plus_bounds is not None and window_plus_bounds.collidepoint(mx, my):
+                    config.window_size += size_change
+                    config.validate()
+                    config.update_window()
+                elif letter_minus_bounds is not None and letter_minus_bounds.collidepoint(mx, my):
+                    config.num_letters -= 1
+                    config.validate()
+                elif letter_plus_bounds is not None and letter_plus_bounds.collidepoint(mx, my):
+                    config.num_letters += 1
+                    config.validate()
+        screen.fill((0, 0, 0))
+        exit_bounds = plain_text(5, letter_height*0.25, "X", (255, 255, 255), options_font, outline=True)
+
+        reset_bounds = plain_text(5, letter_height*1.0, "RESET", (255, 255, 255), options_font, outline=True)
+
+        # Window size
+        _, _, start_offset, _ = plain_text(5, letter_height * 2.5, "Window size: ", (255, 255, 255), options_font)
+        window_minus_bounds = plain_text(5 + start_offset, letter_height * 2.5, "-", (255, 255, 255), options_font,
+                                         outline=True)
+        gap = width(" " * 6) / 2
+        plain_text(10 + (gap / 2) + start_offset, letter_height * 2.75, str(config.window_size), (255, 255, 255),
+                   options_font, centered=True)
+        window_plus_bounds = plain_text(5 + gap + start_offset, letter_height * 2.5, "+", (255, 255, 255), options_font,
+                                        outline=True)
+
+        # Word length
+        _, _, start_offset, _ = plain_text(5, letter_height * 3.5, "Word length: ", (255, 255, 255), options_font)
+        letter_minus_bounds = plain_text(5 + start_offset, letter_height * 3.5, "-", (255, 255, 255), options_font,
+                                         outline=True)
+        gap = width(" RANDOM ") / 2
+        length_str = str(config.num_letters)
+        if config.num_letters == 0:
+            length_str = "RANDOM"
+        plain_text(10 + (gap / 2) + start_offset, letter_height * 3.75, length_str, (255, 255, 255),
+                   options_font, centered=True)
+        letter_plus_bounds = plain_text(5 + gap + start_offset, letter_height * 3.5, "+", (255, 255, 255), options_font,
+                                        outline=True)
+        pygame.display.update()
+    config.save()
 
 
 def run_game():
+    global options_bounds
     play_again = False
     wordle = re_wordle_api.Wordle()
     # change to pick_word_reasonable_length for more random lengths while being sensible
     # wordle.pick_word_from_length(5)
-    if args.letters == -1:
+    if config.num_letters == 0:
         wordle.pick_word_reasonable_length()
     else:
-        wordle.pick_word_from_length(args.letters)
+        wordle.pick_word_from_length(config.num_letters)
+    print(wordle.word)
 
     print(f"List length: {len(wordle.wordList)}\nWord Length: {len(wordle.word)}")
 
@@ -201,32 +442,62 @@ def run_game():
                     elif event.key == pygame.K_q:
                         play_again = False
                         kg = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mx, my = pygame.mouse.get_pos()
+                if options_bounds is not None and options_bounds.collidepoint(mx, my):
+                    run_options()
+                    if config.num_letters != 0 and config.num_letters != len(wordle.word):
+                        wordle = re_wordle_api.Wordle()
+                        wordle.pick_word_from_length(config.num_letters)
+                        # Setup keyboard
+                        l1 = "QWERTYUIOP"
+                        l2 = "ASDFGHJKL"
+                        l3 = "ZXCVBNM"
+                        line_1 = {x: -1 for x in l1}
+                        line_2 = {x: -1 for x in l2}
+                        line_3 = {x: -1 for x in l3}
+
+                        typed_word = ""
+
+                        kg = True
+                        red_flash_end = 0
+                        interactable = True
 
         # Render
         screen.fill((0, 0, 0))
         if time.time() < red_flash_end:
             screen.fill((100, 0, 0))
+        # Options button
+        options_bounds = plain_text(5,
+                                    5,
+                                    options_text,
+                                    (255, 255, 255),
+                                    options_font,
+                                    outline=True)
+        # Text
 
         wx = x_for_centering(wordle.word)
-        wy = 20
+        wy = int((letter_height / 5) * 2)
         for guess in wordle.guesses:
-            wy += render_word(wordle.generate_response(guess), (wx, wy)) + 15
+            wy += render_word(wordle.generate_response(guess), (wx, wy)) + vertical_spacing
         if len(wordle.guesses) < 6 and (len(wordle.guesses) == 0 or wordle.guesses[-1] != wordle.word):
             render_word(typed_word + " " * (len(wordle.word) - len(typed_word)), (wx, wy))
-            render_keyboard(line_1, line_2, line_3, (115, 410))
+            render_keyboard(line_1, line_2, line_3, (115, int((vertical_spacing + letter_height) * 6.3076923076923075)))
         else:
             if wordle.guesses[-1] == wordle.word:
                 wx = x_for_centering("CONGRATULATIONS!")
-                wy += render_word(f"{re_wordle_api.GREEN}CONGRATULATIONS!{re_wordle_api.RESET}", (wx, wy)) + 15
+                wy += render_word(f"{re_wordle_api.GREEN}CONGRATULATIONS!{re_wordle_api.RESET}",
+                                  (wx, wy)) + vertical_spacing
             else:
                 if interactable:
                     red_flash_end = time.time() + 2
                 wx = x_for_centering("INCORRECT")
-                wy += render_word(f"{re_wordle_api.YELLOW}INCORRECT{re_wordle_api.RESET}", (wx, wy)) + 15
+                wy += render_word(f"{re_wordle_api.YELLOW}INCORRECT{re_wordle_api.RESET}", (wx, wy)) + vertical_spacing
                 wx = x_for_centering("THE WORD WAS")
-                wy += render_word(f"{re_wordle_api.WHITE}THE WORD WAS{re_wordle_api.RESET}", (wx, wy)) + 15
+                wy += render_word(f"{re_wordle_api.WHITE}THE WORD WAS{re_wordle_api.RESET}",
+                                  (wx, wy)) + vertical_spacing
                 wx = x_for_centering(wordle.word)
-                wy += render_word(re_wordle_api.GREEN + wordle.word + re_wordle_api.RESET, (wx, wy)) + 15
+                wy += render_word(re_wordle_api.GREEN + wordle.word + re_wordle_api.RESET, (wx, wy)) + vertical_spacing
             interactable = False
         pygame.display.update()
     return play_again

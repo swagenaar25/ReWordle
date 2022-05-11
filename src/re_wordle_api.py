@@ -27,6 +27,10 @@ DARK = "%"
 RESET = "^"
 
 
+def clear_color_codes(text: str) -> str:
+    return text.replace(GREEN, "").replace(YELLOW, "").replace(WHITE, "").replace(DARK, "").replace(RESET, "")
+
+
 def license_notice():
     return """
 Copyright (C) 2022  Sam Wagenaar, Dakota Goldberg
@@ -57,6 +61,14 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+def external_path(relative_path: str) -> str:
+    is_frozen = getattr(sys, 'frozen', False)
+    if is_frozen:
+        return os.path.join(os.path.dirname(os.path.abspath(sys.executable)), relative_path)
+    else:
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", relative_path)
+
+
 class Wordle:
 
     def __init__(self):
@@ -78,6 +90,7 @@ class Wordle:
                 if ok:
                     words.append(line)
         self.wordList = words.copy()
+        return words
 
     def pick_word_from_length(self, length):
         self.gen_list(length)
