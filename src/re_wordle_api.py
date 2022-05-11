@@ -93,7 +93,6 @@ class Wordle:
     # Create word list
     def gen_list(self, length):
         words = []
-        print(self.word_list_location())
         lines = open(resource_path(self.word_list_location())).read().splitlines()
         for line in lines:
             if length == -1 or len(line) == length:
