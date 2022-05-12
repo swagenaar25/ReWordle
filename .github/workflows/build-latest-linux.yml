@@ -34,25 +34,6 @@ jobs:
           pip install pyinstaller
       #    python3 -m pip install pygame==1.9.6
       #    python3 -c "import pygame;print('hello')"
-
-      #- name: PyInstaller Linux ReWordle Console
-      #  # You may pin to the exact commit or the version.
-      #  # uses: JackMcKew/pyinstaller-action-linux@38639c352a36917eea765f9283bfd1092c28af7b
-      #  uses: JackMcKew/pyinstaller-action-linux@main
-      #  with:
-      #    # Directory containing source code & .spec file (optional requirements.txt).
-      #    path: src # default is src
-      #    # Specify a file path for .spec file
-      #    spec: re_wordle_console.spec # optional, default is
-      #- name: PyInstaller Linux ReWordle Windowed
-      #  # You may pin to the exact commit or the version.
-      #  # uses: JackMcKew/pyinstaller-action-linux@38639c352a36917eea765f9283bfd1092c28af7b
-      #  uses: JackMcKew/pyinstaller-action-linux@main
-      #  with:
-      #    # Directory containing source code & .spec file (optional requirements.txt).
-      #    path: src # default is src
-      #    # Specify a file path for .spec file
-      #    spec: re_wordle_windowed.spec # optional, default is
       - name: PyInstaller Linux ReWordle Console
         run:
           python3 -m PyInstaller src/re_wordle_console.spec
@@ -62,7 +43,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: packaged-binaries
-          path: src/dist/linux
+          path: dist
       
       - name: Echo directory
         run: ls dist/
