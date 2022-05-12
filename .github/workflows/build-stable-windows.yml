@@ -62,7 +62,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            return context.payload.ref.replace(/\/refs\/tags\//, '');
+            return context.payload.ref.replace("refs/tags/", '');
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -122,7 +122,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            return context.payload.ref.replace(/\/refs\/tags\//, '');
+            return context.payload.ref.replace("refs/tags/", '');
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
