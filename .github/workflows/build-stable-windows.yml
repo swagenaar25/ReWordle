@@ -116,7 +116,10 @@ jobs:
       - name: Get the version
         id: get_version
         shell: bash
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: |
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+          echo ${GITHUB_REF}
+          echo ${GITHUB_REF/refs\/tags\//}
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
