@@ -1,2 +1,3 @@
 en:English
-lat:Latin (Lingua latina)
+lat:Lingua latina (Latin)
+nl:Nederlands (Dutch)
