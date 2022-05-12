@@ -188,6 +188,7 @@ def fit_font():
     horizontal_spacing = letter_width / 2  # noqa
 
 
+config.update_window()
 fit_font()
 config.validate()
 
