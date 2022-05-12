@@ -65,11 +65,11 @@ jobs:
           path: src/dist/linux
       
       - name: Echo directory
-        run: ls src/dist/linux
+        run: ls src/dist/
       #zip up files
       - uses: papeloto/action-zip@v1
         with:
-          files: src/dist/linux/rewordle_console src/dist/linux/rewordle_windowed LICENSE.txt README.md
+          files: src/dist/rewordle_console src/dist/rewordle_windowed LICENSE.txt README.md
           dest: linux_binaries.zip
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
