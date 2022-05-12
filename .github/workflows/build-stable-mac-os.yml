@@ -51,6 +51,9 @@ jobs:
         run: cd dist && cp ../LICENSE.txt ./LICENSE.txt && cp ../README.md ./README.md && zip -r9 macOS_binaries.zip rewordle_windowed.app rewordle_console LICENSE.txt README.md
       - name: Echo directory 2
         run: ls; ls dist
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       #zip up files
       #- uses: papeloto/action-zip@v1
       #  with:
@@ -60,9 +63,9 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "macOS-${{ github.ref }}"
+          automatic_release_tag: "macOS-${{ steps.get_version.outputs.VERSION }}"
           prerelease: false
-          title: "Release ${{ github.ref }} - MacOS"
+          title: "Release ${{ steps.get_version.outputs.VERSION }} - MacOS"
           files: |
             LICENSE.txt
             dist/macOS_binaries.zip

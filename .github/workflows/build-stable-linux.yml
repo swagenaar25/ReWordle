@@ -52,13 +52,16 @@ jobs:
         with:
           files: dist/rewordle_console dist/rewordle_windowed LICENSE.txt README.md
           dest: linux_binaries.zip
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       #auto release
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "linux-${{ github.ref }}"
+          automatic_release_tag: "linux-${{ steps.get_version.outputs.VERSION }}"
           prerelease: false
-          title: "Release ${{ github.ref }} - Linux"
+          title: "Release ${{ steps.get_version.outputs.VERSION }} - Linux"
           files: |
             LICENSE.txt
             linux_binaries.zip
