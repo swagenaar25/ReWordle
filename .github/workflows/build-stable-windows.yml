@@ -124,9 +124,9 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "windows-x86-${{ steps.tag.outputs.result }}"
+          automatic_release_tag: "windows-x86-${{ steps.get_version.outputs.VERSION }}"
           prerelease: false
-          title: "Release ${{ steps.tag.outputs.result }} - Windows X86"
+          title: "Release ${{ steps.get_version.outputs.VERSION }} - Windows X86"
           files: |
             LICENSE.txt
             windows_binaries_x86.zip
